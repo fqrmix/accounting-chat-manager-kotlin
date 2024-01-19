@@ -6,7 +6,7 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.handlers.CommandHandlerEnvironment
 import com.github.kotlintelegrambot.entities.ChatId
 
-class CommandBuilder {
+class DispatcherBuilder {
     private data class Command(
         val commandName: String,
         val handleCommand: suspend CommandHandlerEnvironment.() -> Unit
@@ -14,11 +14,7 @@ class CommandBuilder {
 
     private lateinit var commandList : List<Command>
 
-    fun build() {
-
-    }
-
-    private fun Dispatcher.setUpCommands() {
+    fun Dispatcher.setUpCommands() {
         command("start") {
             val chatId = ChatId.fromId(message.chat.id)
             bot.sendMessage(
@@ -60,6 +56,10 @@ class CommandBuilder {
         callbackQuery(callbackData = "callbackData4") {
             // TODO
         }
+    }
+
+    fun build() {
+
     }
 
 }

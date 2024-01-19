@@ -1,4 +1,8 @@
 package org.example.storage.exposed.models
 
-class User {
-}
+data class User(
+    override val id: Long? = null,
+    val name: String,
+    val lunchTime: String
+) : BaseModel(id)
+
