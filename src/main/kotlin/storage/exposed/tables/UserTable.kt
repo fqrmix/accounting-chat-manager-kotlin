@@ -1,4 +1,4 @@
-package org.example.storage.exposed.tabels
+package org.example.storage.exposed.tables
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 

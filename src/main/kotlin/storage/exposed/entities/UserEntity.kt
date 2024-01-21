@@ -1,6 +1,6 @@
 package org.example.storage.exposed.entities
 
-import org.example.storage.exposed.tabels.UserTable
+import org.example.storage.exposed.tables.UserTable
 import org.example.storage.exposed.models.User
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass

@@ -1,19 +1,35 @@
 package org.example
 
-import org.example.bot.AccountingChatBot
-import org.example.bot.MessageScheduler
+import org.example.bot.*
+import org.example.storage.exposed.utils.DatabaseSingleton
 
 class Main {
     fun run() {
-        val bot = AccountingChatBot().build()
-        MessageScheduler.init()
-        bot.startPolling()
+        try {
+            val bot = AccountingChatBot().build()
 
+            MessageScheduler.init()
+            DatabaseSingleton.init()
 
+            with(bot) {
+                createCurrentDayScheduleTasks()
+                createChattersTasks()
+                createLunchTasks()
+                startPolling()
+            }
+
+        } catch (e: Exception) {
+            println(e)
+        }
 
     }
 }
 
 fun main() {
-    Main().run()
+    try {
+        Main().run()
+    } catch (e: Exception) {
+        println(e)
+    }
+
 }

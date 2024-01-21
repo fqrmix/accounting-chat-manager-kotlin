@@ -7,6 +7,6 @@ interface UserRepository : CrudRepository<User> {
     /**
      * Find user by username
      */
-    suspend fun getByName(userName: String): User
+    suspend fun findByName(userName: String): User
 
 }

@@ -9,7 +9,7 @@ import com.github.kotlintelegrambot.entities.ChatId
 class DispatcherBuilder {
     private data class Command(
         val commandName: String,
-        val handleCommand: suspend CommandHandlerEnvironment.() -> Unit
+        val handleCommand: suspend CommandHandlerEnvironment.() -> Unit,
     )
 
     private lateinit var commandList : List<Command>

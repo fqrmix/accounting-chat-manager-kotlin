@@ -8,7 +8,6 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates
 
-
 object MessageScheduler {
 
     private lateinit var scheduler : ScheduledExecutorService
@@ -17,7 +16,7 @@ object MessageScheduler {
         scheduler = Executors.newScheduledThreadPool(1)
     }
 
-    fun createScheduledTask(task: MyRunnableTask, executionTime: LocalDateTime) : ScheduledFuture<*> {
+    fun createScheduledTask(task: RunnableTask, executionTime: LocalDateTime) : ScheduledFuture<*> {
         if (!MessageScheduler::scheduler.isInitialized) {
             throw RuntimeException("MessageScheduler object is not initialized. " +
                     "Call init() function once before database interaction")
@@ -33,13 +32,16 @@ object MessageScheduler {
             ).seconds,
             TimeUnit.SECONDS
         )
+        println("Got a new task: $scheduledTask")
 
+        task.setStatus(RunnableTask.TaskStatus.WAITING_FOR_EXECUTION)
         return scheduledTask
     }
 }
 
-class MyRunnableTask(val task: () -> Unit) : Runnable {
+class RunnableTask(val task: () -> Unit) : Runnable {
 
+    private val taskName = task.javaClass
     private var status: Int
             by Delegates.observable(1) {
                     property,

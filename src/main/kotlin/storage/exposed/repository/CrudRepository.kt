@@ -29,5 +29,5 @@ interface CrudRepository<T> {
     /**
      *
      */
-    suspend fun delete(id: Int):Boolean
+    suspend fun delete(id: Int): T
 }

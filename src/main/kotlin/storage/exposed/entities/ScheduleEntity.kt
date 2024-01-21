@@ -2,7 +2,6 @@ package org.example.storage.exposed.entities
 
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.tables.ScheduleTable
-import org.example.storage.exposed.tabels.UserTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -21,7 +20,7 @@ class ScheduleEntity(id: EntityID<Int>) : IntEntity(id) {
 
     var startDateTime by ScheduleTable.startDateTime
     var endDateTime by ScheduleTable.endDateTime
-    var user by UserEntity referencedOn UserTable.id
+    var user by UserEntity referencedOn ScheduleTable.user
     //endregion
 
     /**
