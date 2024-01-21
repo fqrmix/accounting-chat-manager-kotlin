@@ -2,11 +2,26 @@ plugins {
     id("org.jetbrains.kotlinx.dataframe") version "0.12.0"
     kotlin("jvm") version "1.9.21"
     application
+    id("java")
+}
+
+tasks.register("fatJar", Jar::class.java) {
+    archiveClassifier.set("all")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes("Main-Class" to "org.example.MainKt")
+    }
+    from(configurations.runtimeClasspath.get()
+        .onEach { println("add from dependencies: ${it.name}") }
+        .map { if (it.isDirectory) it else zipTree(it) })
+    val sourcesMain = sourceSets.main.get()
+    sourcesMain.allSource.forEach { println("add from sources: ${it.name}") }
+    from(sourcesMain.output)
 }
 
 
 group = "org.example"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -32,10 +47,9 @@ tasks.test {
 }
 
 
+
+
 kotlin {
     jvmToolchain(17)
 }
 
-application {
-    mainClass.set("$group.MainKt")
-}

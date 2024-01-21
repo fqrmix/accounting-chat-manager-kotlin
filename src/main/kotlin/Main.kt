@@ -1,6 +1,10 @@
 package org.example
 
-import org.example.bot.*
+import org.example.bot.AccountingChatBot
+import org.example.bot.MessageScheduler
+import org.example.bot.createLunchTasks
+import org.example.bot.createChattersTasks
+import org.example.bot.createCurrentDayScheduleTasks
 import org.example.storage.exposed.utils.DatabaseSingleton
 
 class Main {

@@ -28,6 +28,7 @@ class ScheduleEntity(id: EntityID<Int>) : IntEntity(id) {
      */
     fun toSchedule() : Schedule {
         return Schedule(
+            id = id.value.toLong(),
             startDateTime = startDateTime,
             endDateTime = endDateTime,
             user = user.toUser()

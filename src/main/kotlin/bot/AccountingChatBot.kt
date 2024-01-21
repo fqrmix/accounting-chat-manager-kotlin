@@ -50,7 +50,7 @@ fun Bot.createChattersTasks() {
 
     with(ScheduleRepositoryImpl.getInstance()) {
         runBlocking {
-            scheduleList = findAllByDate(LocalDateTime.now().plusDays(1).withYear(2023))
+            scheduleList = findAllByDate(LocalDateTime.now())
         }
     }
     scheduleList.forEach {
@@ -78,8 +78,8 @@ fun Bot.createCurrentDayScheduleTasks() {
 
     val currentDateTime = LocalDateTime.now()
     val executionDateTime = currentDateTime
-        .withHour(16)
-        .withMinute(53)
+        .withHour(8)
+        .withMinute(0)
 
     val scheduleList : List<Schedule>
 
@@ -91,7 +91,9 @@ fun Bot.createCurrentDayScheduleTasks() {
     MessageScheduler.createScheduledTask(
         RunnableTask { this.sendMessage(
             chatId = ChatId.fromId(966243980),
-            text = "Сегодня в чатах: + $scheduleList"
+            text = "Сегодня в чатах:\n\n" + scheduleList.joinToString (separator = "\n") {
+                "${it.user.name} | ${it.startDateTime.toLocalTime()}-${it.endDateTime.toLocalTime()}"
+            }
         ) },
         executionTime = executionDateTime
     )

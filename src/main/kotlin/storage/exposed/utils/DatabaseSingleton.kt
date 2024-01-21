@@ -11,10 +11,7 @@ object DatabaseSingleton {
     private lateinit var database: Database
     fun init() {
         database = Database.connect(
-            "jdbc:postgresql://+" +
-                    System.getenv("POSTGRES_HOST") +
-                    "/" +
-                    System.getenv("POSTGRES_DATABASE"),
+            url = System.getenv("POSTGRES_URL"),
             driver = "org.postgresql.Driver",
             user = System.getenv("POSTGRES_USER"),
             password = System.getenv("POSTGRES_PASSWORD"),
