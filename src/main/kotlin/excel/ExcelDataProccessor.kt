@@ -31,7 +31,7 @@ class ExcelDataProcessor private constructor(
         }
     }
 
-    fun getScheduleList(): List<Schedule> {
+    fun getScheduleList(): MutableList<Schedule> {
         if (scheduleList.isNotEmpty()) {
             return scheduleList
         } else {

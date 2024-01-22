@@ -45,6 +45,7 @@ class UserRepositoryImpl private constructor(): UserRepository {
             response = UserEntity.new {
                 name = item.name
                 lunchTime = item.lunchTime
+                telegramId = item.telegramId
             }.toUser()
         }
 
@@ -56,6 +57,7 @@ class UserRepositoryImpl private constructor(): UserRepository {
             UserEntity[item.id!!.toInt()].let {
                 it.name = item.name
                 it.lunchTime = item.lunchTime
+                it.telegramId = item.telegramId
                 response = it.toUser()
             }
         }

@@ -24,6 +24,10 @@ object MessageScheduler {
 
         val currentTime = LocalDateTime.now()
 
+        if (currentTime > executionTime) {
+            throw RuntimeException("$currentTime is more than $executionTime. Skipping task")
+        }
+
         val scheduledTask = scheduler.schedule(
             task,
             Duration.between(
@@ -32,7 +36,7 @@ object MessageScheduler {
             ).seconds,
             TimeUnit.SECONDS
         )
-        println("Got a new task: $scheduledTask")
+        println("Got a new task: $scheduledTask. Execution Time: $executionTime. Context: ${task.getContext()}")
 
         task.setStatus(RunnableTask.TaskStatus.WAITING_FOR_EXECUTION)
         return scheduledTask
@@ -50,7 +54,7 @@ class RunnableTask(val task: () -> Unit) : Runnable {
             }
 
     private fun onChange(oldValue: Int, newValue: Int) {
-        println("Status changed from $oldValue to $newValue. Current status: ${getStatus()}")
+        println("Status changed from $oldValue to $newValue. Current status: ${getStatus()} ")
     }
 
     override fun run() {
@@ -76,6 +80,10 @@ class RunnableTask(val task: () -> Unit) : Runnable {
             4 -> TaskStatus.CANCELED
             else -> {TaskStatus.UNKNOWN}
         }
+    }
+
+    fun getContext(): String {
+        return taskName.toString()
     }
 
     enum class TaskStatus {

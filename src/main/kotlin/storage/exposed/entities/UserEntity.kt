@@ -19,6 +19,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
 
     var name by UserTable.name
     var lunchTime by UserTable.lunchTime
+    var telegramId by UserTable.telegramId
     //endregion
 
     /**
@@ -28,7 +29,8 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
         return User(
             id.value.toLong(),
             name = name,
-            lunchTime = lunchTime
+            lunchTime = lunchTime,
+            telegramId = telegramId
         )
     }
 }

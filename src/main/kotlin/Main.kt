@@ -16,10 +16,10 @@ class Main {
             DatabaseSingleton.init()
 
             with(bot) {
+                startPolling()
                 createCurrentDayScheduleTasks()
                 createChattersTasks()
                 createLunchTasks()
-                startPolling()
             }
 
         } catch (e: Exception) {

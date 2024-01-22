@@ -8,4 +8,4 @@ RUN gradle fatJar --no-daemon
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/build/libs/accounting-chat-bot-1.0-all.jar app.jar
-CMD ["java", "-jar", "app.jar"]
+#CMD ["java", "-jar", "app.jar"]

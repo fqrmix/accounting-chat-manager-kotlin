@@ -8,6 +8,7 @@ import org.example.storage.exposed.repository.ScheduleRepository
 import org.example.storage.exposed.tables.ScheduleTable
 import org.example.storage.exposed.utils.DatabaseSingleton.suspendedTransaction
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.javatime.date
 import java.time.LocalDateTime
 
@@ -48,7 +49,9 @@ class ScheduleRepositoryImpl private constructor(): ScheduleRepository {
     override suspend fun findAllByDate(date: LocalDateTime): List<Schedule> {
         val result = mutableListOf<Schedule>()
         suspendedTransaction {
-            ScheduleEntity.find { ScheduleTable.startDateTime.date() eq date.toLocalDate() }
+            ScheduleEntity
+                .find { ScheduleTable.startDateTime.date() eq date.toLocalDate() }
+                .orderBy(ScheduleTable.startDateTime to SortOrder.ASC)
                 .all {
                     result.add(it.toSchedule())
                 }
@@ -80,7 +83,19 @@ class ScheduleRepositoryImpl private constructor(): ScheduleRepository {
         }
     }
 
-    override suspend fun findAll(): List<Schedule>? {
+    suspend fun batchUpdate(items: List<Schedule>) {
+        suspendedTransaction {
+            items.forEach { model ->
+                ScheduleEntity[model.id!!.toInt()].let { entity ->
+                    entity.user = UserEntity.findById(model.user.id!!.toInt())!!
+                    entity.startDateTime = model.startDateTime
+                    entity.endDateTime = model.endDateTime
+                }
+            }
+        }
+    }
+
+    override suspend fun findAll(): List<Schedule> {
         lateinit var result : List<Schedule>
         suspendedTransaction {
             result = ScheduleEntity.all().map { it.toSchedule() }
@@ -89,7 +104,7 @@ class ScheduleRepositoryImpl private constructor(): ScheduleRepository {
         return result
     }
 
-    override suspend fun findById(id: Int): Schedule? {
+    override suspend fun findById(id: Int): Schedule {
         suspendedTransaction {
             response = ScheduleEntity[id].toSchedule()
         }
