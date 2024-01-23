@@ -146,7 +146,7 @@ class AccountingChatBot {
         return bot {
             token = TOKEN
             timeout = TIMEOUT_TIME
-            logLevel = LogLevel.Error
+            logLevel = LogLevel.Network.Body
             dispatch {
                 command("load") {
                     bot.sendMessage(ChatId.fromId(message.chat.id),"Пришли файл")
@@ -162,7 +162,7 @@ class AccountingChatBot {
 
                 document {
                     if (userStates[ChatId.fromId(message.chat.id)] == State.LOAD_PENDING) {
-                        message.document?.let { it ->
+                        message.document?.let {
                         try {
                             val excelParser = ScheduleParser()
                             val scheduleBuilderFactory = DefaultScheduleBuilderFactory()

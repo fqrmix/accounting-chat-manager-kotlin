@@ -16,7 +16,7 @@ object MessageScheduler {
         scheduler = Executors.newScheduledThreadPool(1)
     }
 
-    fun createScheduledTask(task: RunnableTask, executionTime: LocalDateTime) : ScheduledFuture<*> {
+    fun createScheduledTask(task: RunnableTask, executionTime: LocalDateTime) : ScheduledFuture<*>? {
         if (!MessageScheduler::scheduler.isInitialized) {
             throw RuntimeException("MessageScheduler object is not initialized. " +
                     "Call init() function once before database interaction")
@@ -28,18 +28,25 @@ object MessageScheduler {
             throw RuntimeException("$currentTime is more than $executionTime. Skipping task")
         }
 
-        val scheduledTask = scheduler.schedule(
-            task,
-            Duration.between(
-                currentTime,
-                executionTime
-            ).seconds,
-            TimeUnit.SECONDS
-        )
-        println("Got a new task: $scheduledTask. Execution Time: $executionTime. Context: ${task.getContext()}")
+        try {
+            val scheduledTask = scheduler.schedule(
+                task,
+                Duration.between(
+                    currentTime,
+                    executionTime
+                ).toMillis(),
+                TimeUnit.MILLISECONDS
+            )
 
-        task.setStatus(RunnableTask.TaskStatus.WAITING_FOR_EXECUTION)
-        return scheduledTask
+            println("Got a new task: $scheduledTask. Execution Time: $executionTime. Context: ${task.getContext()}")
+            task.setStatus(RunnableTask.TaskStatus.WAITING_FOR_EXECUTION)
+            return scheduledTask
+        } catch (e: Exception){
+            println("Failed to schedule task with reason: $e")
+            return null
+        }
+
+
     }
 }
 
@@ -48,7 +55,7 @@ class RunnableTask(val task: () -> Unit) : Runnable {
     private val taskName = task.javaClass
     private var status: Int
             by Delegates.observable(1) {
-                    property,
+                    _,
                     oldValue,
                     newValue -> onChange(oldValue, newValue)
             }
@@ -58,8 +65,15 @@ class RunnableTask(val task: () -> Unit) : Runnable {
     }
 
     override fun run() {
-        task()
-        status = 3
+        try {
+            task()
+            status = 3
+        } catch (e: Exception) {
+            println("Task $this was canceled because of exception: $e")
+            status = 4
+        }
+
+
     }
 
     fun setStatus(taskStatus: TaskStatus) {
@@ -68,7 +82,6 @@ class RunnableTask(val task: () -> Unit) : Runnable {
             TaskStatus.WAITING_FOR_EXECUTION -> this.status = 2
             TaskStatus.DONE -> this.status = 3
             TaskStatus.CANCELED -> this.status = 4
-            TaskStatus.UNKNOWN -> this.status = 0
         }
     }
 
@@ -78,7 +91,9 @@ class RunnableTask(val task: () -> Unit) : Runnable {
             2 -> TaskStatus.WAITING_FOR_EXECUTION
             3 -> TaskStatus.DONE
             4 -> TaskStatus.CANCELED
-            else -> {TaskStatus.UNKNOWN}
+            else -> {
+                throw RuntimeException("Task status is incorrect. Only 1..4 integers allowed!")
+            }
         }
     }
 
@@ -90,7 +105,6 @@ class RunnableTask(val task: () -> Unit) : Runnable {
         CREATED,
         WAITING_FOR_EXECUTION,
         DONE,
-        CANCELED,
-        UNKNOWN
+        CANCELED
     }
 }
