@@ -36,7 +36,7 @@ fun Bot.createLunchTasks() {
             createScheduledTask(
                 RunnableTask {
                     this.sendMessage(
-                        chatId = ChatId.fromId(-4114478149),
+                        chatId = ChatId.fromId(-1002023309104),
                         text = "[${it.user.name}](tg://user?id=${it.user.telegramId}) ушел(-ла) на обед \uD83C\uDF7D",
                         parseMode = ParseMode.MARKDOWN
                     )
@@ -66,7 +66,7 @@ fun Bot.createChattersTasks() {
                 createScheduledTask(
                     RunnableTask {
                         this@createChattersTasks.sendMessage(
-                            chatId = ChatId.fromId(-4114478149),
+                            chatId = ChatId.fromId(-1002023309104),
                             text = "[${it.user.name}](tg://user?id=${it.user.telegramId}), заходи, пожалуйста, в чаты " +
                                     "\uD83D\uDCAC",
                             parseMode = ParseMode.MARKDOWN
@@ -82,7 +82,7 @@ fun Bot.createChattersTasks() {
                 createScheduledTask(
                     RunnableTask {
                         this@createChattersTasks.sendMessage(
-                            chatId = ChatId.fromId(-4114478149),
+                            chatId = ChatId.fromId(-1002023309104),
                             text = "[${it.user.name}](tg://user?id=${it.user.telegramId}), выходи, пожалуйста, из чатов " +
                                     "\uD83C\uDFC3\uD83C\uDFC3\u200D♂\uFE0F\uD83C\uDFC3\u200D♂\uFE0F",
                             parseMode = ParseMode.MARKDOWN
@@ -116,7 +116,7 @@ fun Bot.createCurrentDayScheduleTasks() {
         createScheduledTask(
             RunnableTask {
                 this.sendMessage(
-                    chatId = ChatId.fromId(-4114478149),
+                    chatId = ChatId.fromId(-1002023309104),
                     text = "Доброе утро \uD83C\uDF05\n\n" +
                             "Сегодня в чатах:\n" + scheduleList.joinToString (separator = "\n") {
                         "`${it.startDateTime.toLocalTime()} - ${it.endDateTime.toLocalTime()}` | " +

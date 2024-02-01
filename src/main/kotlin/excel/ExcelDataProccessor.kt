@@ -82,7 +82,7 @@ class ExcelDataProcessor private constructor(
                         user = findByName(item["Name"].toString())
                         println("User $user already exist in database")
                     } catch (e: NoSuchElementException) {
-                        user = scheduleBuilderFactory.createUser(item["Name"].toString(), item["Lunch"].toString())
+                        user = scheduleBuilderFactory.createUser(item["Name"].toString().trim(), item["Lunch"].toString())
                         println("User $user was successfully created!")
                     }
                 }
@@ -96,10 +96,10 @@ class ExcelDataProcessor private constructor(
 
     private fun buildTimeList(dateValue: String): List<TimeObject> {
         return try {
-            if (dateValue.contains("\n")) {
-                dateValue.split("\n").map { scheduleBuilderFactory.createTimeObject(it) }
+            if (dateValue.contains("\n") && dateValue.length > 12) {
+                dateValue.split("\n").map { scheduleBuilderFactory.createTimeObject(it.trim()) }
             } else {
-                listOf(scheduleBuilderFactory.createTimeObject(dateValue))
+                listOf(scheduleBuilderFactory.createTimeObject(dateValue.trim()))
             }
         } catch (e: Exception) {
             // Обработка ошибок при создании списка TimeObject
