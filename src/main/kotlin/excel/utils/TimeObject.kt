@@ -8,8 +8,8 @@ class TimeObject(
     private val time: String,
 ) {
 
-    private val startTime = time.split("-")[0]
-    private val endTime = time.split("-")[1]
+    private val startTime = time.split("-")[0].trim()
+    private val endTime = time.split("-")[1].trim()
 
     private fun getLocalTime(
         @Pattern("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]\$")
