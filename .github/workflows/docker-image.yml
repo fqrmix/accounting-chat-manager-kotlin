@@ -24,3 +24,21 @@ jobs:
 
     - name: Push image to docker.io
       run: docker push $LOGIN/$NAME:latest
+
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: pulling
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${‎{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: 22
+          script: |
+            cd /usr/docker/${‎{ github.event.repository.name }‎}
+            git pull
+            docker compose pull
+            docker compose up -d
