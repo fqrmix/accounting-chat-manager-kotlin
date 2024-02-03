@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+
+  build_and_push:
+
+    runs-on: ubuntu-latest
+    env:
+     LOGIN: ${{ secrets.DOCKER_LOGIN }}
+     NAME: ${{ secrets.DOCKER_NAME }}
+
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Login to docker.io
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
+      
+    - name: Build the Docker image
+      run: docker build -t $LOGIN/$NAME:latest --file Dockerfile .
+
+    - name: Push image to docker.io
+      run: docker push $LOGIN/$NAME:latest
