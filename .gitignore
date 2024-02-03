@@ -44,3 +44,6 @@ bin/
 ### Excel ###
 *.xlsx
 *.xls
+
+### Env ###
+.env

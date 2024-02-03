@@ -1,21 +1,19 @@
 version: '3'
 services:
   chat-manager-app:
-    build: .
-#    image: "fqrmix/accounting-chat-manager-kotlin:latest"
+    image: "fqrmix/accounting-chat-manager-kotlin:latest"
     networks:
       - docker-private-network
-    ports:
-      - "8080:8080"
+    env_file:
+      - .env
     environment:
       TZ: "Europe/Moscow"
-      TELEGRAM_TOKEN: ""
-      POSTGRES_URL: ""
-      POSTGRES_USER: ""
-      POSTGRES_PASSWORD: ""
+      TELEGRAM_TOKEN: "${TELEGRAM_TOKEN}"
+      POSTGRES_URL: "${POSTGRES_URL}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     command: ["java", "-jar", "app.jar"]
 
 networks:
   docker-private-network:
-    name: docker-private-network
     external: true
