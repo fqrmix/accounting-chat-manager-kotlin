@@ -3,7 +3,9 @@ package org.example.bot
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.*
+import com.github.kotlintelegrambot.dispatcher.command
+import com.github.kotlintelegrambot.dispatcher.document
+import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.logging.LogLevel
@@ -15,6 +17,7 @@ import org.example.excel.utils.DefaultScheduleBuilderFactory
 import org.example.excel.utils.ScheduleFile
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.repository.impl.ScheduleRepositoryImpl
+import org.example.storage.exposed.utils.DatabaseSingleton.suspendedTransaction
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -182,36 +185,36 @@ class AccountingChatBot {
                                 .setScheduleFile(scheduleFile)
                                 .build()
 
-                            var scheduleList = excelDataProcessor.getScheduleList()
-                            var schedulesToUpdate = mutableListOf<Schedule>()
-                            var updatedSchedules = mutableListOf<Schedule>()
+                            val scheduleList = excelDataProcessor.getScheduleList()
+                            val schedulesToDelete = mutableListOf<Schedule>()
 
                             with(ScheduleRepositoryImpl.getInstance()) {
-                                val databaseSchedules = findAll()
+                                val databaseSchedules = runBlocking { findAll() }
+
                                 databaseSchedules.forEach { databaseSchedule ->
                                     scheduleList.forEach { currentSchedule ->
                                         if (currentSchedule.startDateTime.toLocalDate() == databaseSchedule.startDateTime.toLocalDate()
                                             && currentSchedule.endDateTime.toLocalDate() == databaseSchedule.endDateTime.toLocalDate()
-                                            && currentSchedule.user == databaseSchedule.user
                                         ) {
-                                            val newSchedule = Schedule(
-                                                id = databaseSchedule.id,
-                                                startDateTime = currentSchedule.startDateTime,
-                                                endDateTime = currentSchedule.endDateTime,
-                                                user = currentSchedule.user
-                                            )
-                                            schedulesToUpdate.add(newSchedule)
-                                            updatedSchedules.add(currentSchedule)
+                                            schedulesToDelete.add(databaseSchedule)
                                         }
                                     }
                                 }
-                                if(updatedSchedules.isNotEmpty()) {
-                                    batchUpdate(schedulesToUpdate)
-                                    scheduleList.removeAll(updatedSchedules)
+
+                                val databaseActions = mutableListOf<() -> Unit>()
+
+                                if(schedulesToDelete.isNotEmpty()) {
+                                    databaseActions += { runBlocking { batchDelete(schedulesToDelete.distinct()) } }
                                 }
 
                                 if (scheduleList.isNotEmpty()) {
-                                    batchCreate(scheduleList)
+                                    databaseActions += { runBlocking { batchCreate(scheduleList) } }
+                                }
+
+                                if (databaseActions.isNotEmpty()) {
+                                    suspendedTransaction {
+                                        databaseActions.forEach{ it() }
+                                    }
                                 }
                             }
 

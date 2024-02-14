@@ -71,7 +71,7 @@ class ScheduleRepositoryImpl private constructor(): ScheduleRepository {
         return response
     }
 
-    suspend fun batchCreate(items: List<Schedule>) {
+    override suspend fun batchCreate(items: List<Schedule>) {
         suspendedTransaction {
             items.forEach {
                 ScheduleEntity.new {
@@ -83,14 +83,10 @@ class ScheduleRepositoryImpl private constructor(): ScheduleRepository {
         }
     }
 
-    suspend fun batchUpdate(items: List<Schedule>) {
+    override suspend fun batchDelete(items: List<Schedule>) {
         suspendedTransaction {
-            items.forEach { model ->
-                ScheduleEntity[model.id!!.toInt()].let { entity ->
-                    entity.user = UserEntity.findById(model.user.id!!.toInt())!!
-                    entity.startDateTime = model.startDateTime
-                    entity.endDateTime = model.endDateTime
-                }
+            items.forEach { item ->
+                ScheduleEntity[item.id!!.toInt()].delete()
             }
         }
     }
