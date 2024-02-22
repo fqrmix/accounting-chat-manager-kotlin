@@ -8,6 +8,7 @@ import org.example.excel.utils.TimeObject
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.models.User
 import org.example.storage.exposed.repository.impl.UserRepositoryImpl
+import org.example.storage.exposed.utils.UserGroup
 import org.jetbrains.kotlinx.dataframe.AnyFrame
 import org.jetbrains.kotlinx.dataframe.DataRow
 import org.jetbrains.kotlinx.dataframe.api.select
@@ -82,7 +83,12 @@ class ExcelDataProcessor private constructor(
                         user = findByName(item["Name"].toString())
                         println("User $user already exist in database")
                     } catch (e: NoSuchElementException) {
-                        user = scheduleBuilderFactory.createUser(item["Name"].toString().trim(), item["Lunch"].toString())
+                        user = scheduleBuilderFactory.createUser(
+                            item["Name"].toString().trim(),
+                            item["Lunch"].toString(),
+                            UserGroup.UNKNOWN
+                            // TODO: Add group column to Excel file and parse it from DataFrame to Factory.createUser()
+                        )
                         println("User $user was successfully created!")
                     }
                 }

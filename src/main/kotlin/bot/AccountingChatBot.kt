@@ -18,6 +18,7 @@ import org.example.excel.utils.ScheduleFile
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.repository.impl.ScheduleRepositoryImpl
 import org.example.storage.exposed.utils.DatabaseSingleton.suspendedTransaction
+import org.example.storage.exposed.utils.UserGroup
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -144,6 +145,24 @@ fun Bot.createCurrentDayScheduleTasks() {
 }
 
 
+fun List<Schedule>.splitByGroup(): MutableMap<UserGroup, List<Schedule>> {
+    val splittedScheduleList = mutableMapOf<UserGroup, List<Schedule>>()
+
+    UserGroup.entries.forEach { userGroup ->
+
+        val currentList = this.filter {
+            it.user.groupName == userGroup
+        }
+
+        if (currentList.isNotEmpty()) {
+            splittedScheduleList[userGroup] = currentList
+        }
+
+    }
+
+    return splittedScheduleList
+}
+
 
 class AccountingChatBot {
 
@@ -250,12 +269,22 @@ class AccountingChatBot {
                         }
                     }
 
-                    bot.sendMessage(
-                        chatId = ChatId.fromId(message.chat.id),
-                        text = "Сегодня в чатах:\n\n" + scheduleList.joinToString (separator = "\n") {
+                    val mappedScheduleList = scheduleList.splitByGroup()
+
+                    var messageText = "Сегодня в чатах:\n\n"
+
+                    mappedScheduleList.forEach { (userGroup, scheduleList) ->
+                        messageText += userGroup.toString() + "\n"
+                        messageText += scheduleList.joinToString (separator = "\n") {
                             "`${it.startDateTime.toLocalTime()} - ${it.endDateTime.toLocalTime()}` | " +
                                     "[${it.user.name}](tg://user?id=${it.user.telegramId})"
-                        },
+                        }
+                        messageText += "\n"
+                    }
+
+                    bot.sendMessage(
+                        chatId = ChatId.fromId(message.chat.id),
+                        text = messageText,
                         parseMode = ParseMode.MARKDOWN
                     )
                 }
