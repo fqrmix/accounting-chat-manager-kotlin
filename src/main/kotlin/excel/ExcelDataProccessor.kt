@@ -8,11 +8,13 @@ import org.example.excel.utils.TimeObject
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.models.User
 import org.example.storage.exposed.repository.impl.UserRepositoryImpl
+import org.example.storage.exposed.utils.getUserGroupByName
 import org.jetbrains.kotlinx.dataframe.AnyFrame
 import org.jetbrains.kotlinx.dataframe.DataRow
 import org.jetbrains.kotlinx.dataframe.api.select
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlin.NoSuchElementException
 
 class ExcelDataProcessor private constructor(
     private val excelParser: ScheduleParser,
@@ -59,8 +61,8 @@ class ExcelDataProcessor private constructor(
     }
 
     private fun processDateColumn(dataFrame: AnyFrame, date: String) {
-        for (item in dataFrame.select { "Name" and "Lunch" and date }) {
-            if (item[date] != "") {
+        for (item in dataFrame.select { "Name" and "Lunch" and "Group" and date }) {
+            if (item[date].toString().isNotEmpty()) {
                 try {
                     val user = buildUser(item)
                     val currentItemTimeList = buildTimeList(item[date].toString())
@@ -82,7 +84,13 @@ class ExcelDataProcessor private constructor(
                         user = findByName(item["Name"].toString())
                         println("User $user already exist in database")
                     } catch (e: NoSuchElementException) {
-                        user = scheduleBuilderFactory.createUser(item["Name"].toString().trim(), item["Lunch"].toString())
+                        user = scheduleBuilderFactory.createUser(
+                            item["Name"].toString().trim(),
+                            item["Lunch"].toString().trim(),
+                            requireNotNull(
+                                getUserGroupByName(item["Group"].toString().trim())
+                            )
+                        )
                         println("User $user was successfully created!")
                     }
                 }
@@ -90,7 +98,7 @@ class ExcelDataProcessor private constructor(
             return user!!
         } catch (e: Exception) {
             // Обработка ошибок при создании объекта User
-            throw RuntimeException("Failed to create User: ${e.message}")
+            throw RuntimeException("Failed to create User: ${e.stackTraceToString()}")
         }
     }
 

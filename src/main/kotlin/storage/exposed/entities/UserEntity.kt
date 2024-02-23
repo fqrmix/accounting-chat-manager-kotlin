@@ -2,6 +2,7 @@ package org.example.storage.exposed.entities
 
 import org.example.storage.exposed.tables.UserTable
 import org.example.storage.exposed.models.User
+import org.example.storage.exposed.utils.getUserGroupByName
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -20,6 +21,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by UserTable.name
     var lunchTime by UserTable.lunchTime
     var telegramId by UserTable.telegramId
+    var groupName by UserTable.groupName
     //endregion
 
     /**
@@ -30,6 +32,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
             id.value.toLong(),
             name = name,
             lunchTime = lunchTime,
+            groupName = getUserGroupByName(groupName)!!,
             telegramId = telegramId
         )
     }
