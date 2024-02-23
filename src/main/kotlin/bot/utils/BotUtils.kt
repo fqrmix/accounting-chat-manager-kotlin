@@ -30,11 +30,13 @@ fun Bot.createLunchTasks() {
 
                 MessageScheduler.createScheduledTask(
                     RunnableTask {
-                        this.sendMessage(
-                            chatId = ChatId.fromId(GROUP_CHAT_ID),
-                            text = lunchMessage.getText(),
-                            parseMode = lunchMessage.getParseMode()
-                        )
+                        logSuccessOrError({
+                            this.sendMessage(
+                                chatId = ChatId.fromId(GROUP_CHAT_ID),
+                                text = lunchMessage.getText(),
+                                parseMode = lunchMessage.getParseMode()
+                            )
+                        })
                     },
                     executionTime = LocalDateTime.of(
                         LocalDate.now(),
@@ -68,11 +70,13 @@ fun Bot.createChattersTasks() {
 
                     createScheduledTask(
                         RunnableTask {
-                            this@createChattersTasks.sendMessage(
-                                chatId = ChatId.fromId(GROUP_CHAT_ID),
-                                text = chatterMessage.getText(),
-                                parseMode = chatterMessage.getParseMode()
-                            )
+                            logSuccessOrError({
+                                this@createChattersTasks.sendMessage(
+                                    chatId = ChatId.fromId(GROUP_CHAT_ID),
+                                    text = chatterMessage.getText(),
+                                    parseMode = chatterMessage.getParseMode()
+                                )
+                            })
                         },
                         executionTime = it.startDateTime
                     )
@@ -88,11 +92,13 @@ fun Bot.createChattersTasks() {
 
                     createScheduledTask(
                         RunnableTask {
-                            this@createChattersTasks.sendMessage(
-                                chatId = ChatId.fromId(GROUP_CHAT_ID),
-                                text = chatterMessage.getText(),
-                                parseMode = chatterMessage.getParseMode()
-                            )
+                            logSuccessOrError({
+                                this@createChattersTasks.sendMessage(
+                                    chatId = ChatId.fromId(GROUP_CHAT_ID),
+                                    text = chatterMessage.getText(),
+                                    parseMode = chatterMessage.getParseMode()
+                                )
+                            })
                         },
                         executionTime = it.endDateTime
                     )
@@ -130,11 +136,13 @@ fun Bot.createCurrentDayScheduleTasks() {
         try {
             MessageScheduler.createScheduledTask(
                 RunnableTask {
-                    this.sendMessage(
-                        chatId = ChatId.fromId(GROUP_CHAT_ID),
-                        text = chatterMessage.getText(),
-                        parseMode = chatterMessage.getParseMode()
-                    )
+                    logSuccessOrError({
+                        this.sendMessage(
+                            chatId = ChatId.fromId(GROUP_CHAT_ID),
+                            text = chatterMessage.getText(),
+                            parseMode = chatterMessage.getParseMode()
+                        )
+                    })
                 },
                 executionTime = executionDateTime
             )

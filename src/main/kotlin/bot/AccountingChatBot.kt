@@ -7,9 +7,9 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.document
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.logging.LogLevel
 import kotlinx.coroutines.runBlocking
 import org.example.bot.utils.ChatterMessage
+import org.example.bot.utils.logSuccessOrError
 import org.example.excel.ExcelDataProcessor
 import org.example.excel.parser.ScheduleParser
 import org.example.excel.utils.DefaultScheduleBuilderFactory
@@ -37,17 +37,28 @@ class AccountingChatBot {
         return bot {
             token = TOKEN
             timeout = TIMEOUT_TIME
-            logLevel = LogLevel.Network.Body
+//            logLevel = LogLevel.Network.Body
             dispatch {
                 command("load") {
-                    bot.sendMessage(ChatId.fromId(message.chat.id),"Пришли файл")
+                    logSuccessOrError({
+                        bot.sendMessage(
+                            ChatId.fromId(message.chat.id),
+                            "Пришли файл"
+                        )
+                    })
+
                     userStates[ChatId.fromId(message.chat.id)] = State.LOAD_PENDING
                     update.consume()
                 }
 
                 text {
                     if (userStates[ChatId.fromId(message.chat.id)] == State.LOAD_PENDING) {
-                        bot.sendMessage(ChatId.fromId(message.chat.id),"Я жду файл!")
+                        logSuccessOrError({
+                            bot.sendMessage(
+                                ChatId.fromId(message.chat.id),
+                                "Я жду файл!"
+                            )
+                        })
                     }
                 }
 
@@ -97,14 +108,20 @@ class AccountingChatBot {
                                     }
                                 }
                             }
-
-                            bot.sendMessage(ChatId.fromId(message.chat.id),"График успешно загружен!")
-
+                            logSuccessOrError({
+                                bot.sendMessage(
+                                    ChatId.fromId(message.chat.id),
+                                    "График успешно загружен!"
+                                )
+                            })
                         } catch (e: Exception) {
-                            bot.sendMessage(
-                                ChatId.fromId(message.chat.id),
-                                "При обработке графика произошла ошибка!\n\n${e.message}"
-                            )
+                            logSuccessOrError({
+                                bot.sendMessage(
+                                    ChatId.fromId(message.chat.id),
+                                    "При обработке графика произошла ошибка!\n\n${e.message}"
+                                )
+                            })
+
                             println(e)
                         }
                             userStates.remove(ChatId.fromId(message.chat.id))
@@ -114,7 +131,9 @@ class AccountingChatBot {
 
                 command("cancel") {
                     if (userStates[ChatId.fromId(message.chat.id)] == State.LOAD_PENDING) {
-                        bot.sendMessage(ChatId.fromId(message.chat.id),"Действие отменено")
+                        logSuccessOrError({
+                            bot.sendMessage(ChatId.fromId(message.chat.id),"Действие отменено")
+                        })
                         userStates.remove(ChatId.fromId(message.chat.id))
                         update.consume()
                     }
@@ -135,34 +154,41 @@ class AccountingChatBot {
                         .setScheduleList(scheduleList)
                         .build()
 
+                    logSuccessOrError({
+                        bot.sendMessage(
+                            chatId = ChatId.fromId(message.chat.id),
+                            text = chatterMessage.getText(),
+                            parseMode = chatterMessage.getParseMode()
+                        )
+                    })
 
-                    bot.sendMessage(
-                        chatId = ChatId.fromId(message.chat.id),
-                        text = chatterMessage.getText(),
-                        parseMode = chatterMessage.getParseMode()
-                    )
                 }
 
                 command("init") {
                     try {
-                        bot.sendMessage(
-                            chatId = ChatId.fromId(message.chat.id),
-                            text = message.javaClass.toString()
-                        )
+                        logSuccessOrError (
+                            {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(message.chat.id),
+                                    text = message.javaClass.toString()
+                            )},
 
-                        bot.sendMessage(
-                            chatId = ChatId.fromId(message.chat.id),
-                            text = message.chat.type.javaClass.toString()
-                        )
+                            {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(1234),
+                                    text = message.chat.type.javaClass.toString()
+                            )},
+                            {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(message.chat.id),
+                                    text = message.chat.id.toString()
+                            )},
 
-                        bot.sendMessage(
-                            chatId = ChatId.fromId(message.chat.id),
-                            text = message.chat.id.toString()
-                        )
-
-                        bot.sendMessage(
-                            chatId = ChatId.fromId(message.chat.id),
-                            text = "Init was successfully done!"
+                            {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(message.chat.id),
+                                    text = "Init was successfully done!"
+                            )},
                         )
                     } catch (e: Exception) {
                         println(e)
