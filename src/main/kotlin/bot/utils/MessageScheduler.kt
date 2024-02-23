@@ -1,4 +1,4 @@
-package org.example.bot
+package org.example.bot.utils
 
 import java.time.Duration
 import java.time.LocalDateTime

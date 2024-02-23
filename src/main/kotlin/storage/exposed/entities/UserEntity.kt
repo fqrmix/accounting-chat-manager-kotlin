@@ -32,7 +32,7 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
             id.value.toLong(),
             name = name,
             lunchTime = lunchTime,
-            groupName = getUserGroupByName(groupName),
+            groupName = getUserGroupByName(groupName)!!,
             telegramId = telegramId
         )
     }
