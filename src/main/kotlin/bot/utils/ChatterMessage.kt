@@ -82,7 +82,7 @@ class ChatterMessage private constructor (
 
         JOIN_TO_CHAT_MESSAGE {
             override fun getTitle(): String {
-                return "[%s](tg://user?id=%s), заходи, пожалуйста, в чаты".formatTo(FormatAction.BOLD)
+                return "[%s](tg://user?id=%s), заходи, пожалуйста, в чаты"
             }
 
             override fun getSubtitle(): String {
@@ -92,7 +92,7 @@ class ChatterMessage private constructor (
 
         OUT_OF_CHAT_MESSAGE {
             override fun getTitle(): String {
-                return "[%s](tg://user?id=%s), выходи, пожалуйста, из чатов".formatTo(FormatAction.BOLD)
+                return "[%s](tg://user?id=%s), выходи, пожалуйста, из чатов"
             }
 
             override fun getSubtitle(): String {
@@ -102,7 +102,7 @@ class ChatterMessage private constructor (
 
         OUT_FOR_LUNCH_MESSAGE {
             override fun getTitle(): String {
-                return "[%s](tg://user?id=%s) ушел(-ла) на обед".formatTo(FormatAction.BOLD)
+                return "[%s](tg://user?id=%s) ушел(-ла) на обед"
             }
 
             override fun getSubtitle(): String {
