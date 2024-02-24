@@ -1,5 +1,6 @@
 package org.example.bot.utils
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.Executors
@@ -11,6 +12,7 @@ import kotlin.properties.Delegates
 object MessageScheduler {
 
     private lateinit var scheduler : ScheduledExecutorService
+    private val logger = KotlinLogging.logger {}
 
     fun init() {
         scheduler = Executors.newScheduledThreadPool(1)
@@ -38,11 +40,14 @@ object MessageScheduler {
                 TimeUnit.MILLISECONDS
             )
 
-            println("Got a new task: $scheduledTask. Execution Time: $executionTime. Context: ${task.getContext()}")
+            logger.info { "Got a new task: $scheduledTask. Execution Time: $executionTime. Context: ${task.getContext()}" }
             task.setStatus(RunnableTask.TaskStatus.WAITING_FOR_EXECUTION)
             return scheduledTask
         } catch (e: Exception){
-            println("Failed to schedule task with reason: $e")
+            logger.atWarn {
+                message = "Failed to create scheduled task"
+                cause = e
+            }
             return null
         }
 
@@ -60,8 +65,10 @@ class RunnableTask(val task: () -> Unit) : Runnable {
                     newValue -> onChange(oldValue, newValue)
             }
 
+    private val logger = KotlinLogging.logger {}
+
     private fun onChange(oldValue: Int, newValue: Int) {
-        println("Status changed from $oldValue to $newValue. Current status: ${getStatus()} ")
+        logger.info { "Status changed from $oldValue to $newValue. Current status: ${getStatus()} " }
     }
 
     override fun run() {
@@ -69,7 +76,10 @@ class RunnableTask(val task: () -> Unit) : Runnable {
             task()
             status = 3
         } catch (e: Exception) {
-            println("Task $this was canceled because of exception: $e")
+            logger.atWarn {
+                message = "Task $this was canceled because of exception"
+                cause = e
+            }
             status = 4
         }
 

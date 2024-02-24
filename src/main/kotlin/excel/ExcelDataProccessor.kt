@@ -1,5 +1,6 @@
 package org.example.excel
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import org.example.excel.parser.ScheduleParser
 import org.example.excel.utils.ScheduleBuilderFactory
@@ -23,6 +24,7 @@ class ExcelDataProcessor private constructor(
 ) {
 
     private val scheduleList: MutableList<Schedule> = mutableListOf()
+    private val logger = KotlinLogging.logger {}
 
     init {
         try {
@@ -82,7 +84,7 @@ class ExcelDataProcessor private constructor(
                 with(UserRepositoryImpl.getInstance()){
                     try {
                         user = findByName(item["Name"].toString())
-                        println("User $user already exist in database")
+                        logger.info { "User $user already exist in database" }
                     } catch (e: NoSuchElementException) {
                         user = scheduleBuilderFactory.createUser(
                             item["Name"].toString().trim(),
@@ -91,7 +93,7 @@ class ExcelDataProcessor private constructor(
                                 getUserGroupByName(item["Group"].toString().trim())
                             )
                         )
-                        println("User $user was successfully created!")
+                        logger.info { "User $user was successfully created!" }
                     }
                 }
             }

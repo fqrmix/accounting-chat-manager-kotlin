@@ -3,6 +3,7 @@ package org.example.bot.utils
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.entities.ChatId
 import kotlinx.coroutines.runBlocking
+import org.example.bot.AccountingChatBot
 import org.example.bot.AccountingChatBot.Companion.GROUP_CHAT_ID
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.repository.impl.ScheduleRepositoryImpl
@@ -44,7 +45,10 @@ fun Bot.createLunchTasks() {
                     )
                 )
             } catch (e: Exception) {
-                println("Failed to create createLunchTasks: $e")
+                AccountingChatBot.logger.atWarn {
+                    message = "Failed to create createLunchTasks"
+                    cause = e
+                }
             }
         }
     }
@@ -81,7 +85,10 @@ fun Bot.createChattersTasks() {
                         executionTime = it.startDateTime
                     )
                 } catch (e: Exception) {
-                    println("Failed to create chattersTasks: $e")
+                    AccountingChatBot.logger.atWarn {
+                        message = "Failed to create chattersTasks"
+                        cause = e
+                    }
                 }
 
                 try {
@@ -103,7 +110,10 @@ fun Bot.createChattersTasks() {
                         executionTime = it.endDateTime
                     )
                 } catch (e: Exception) {
-                    println("Failed to create chattersTasks: $e")
+                    AccountingChatBot.logger.atWarn {
+                        message = "Failed to create chattersTasks"
+                        cause = e
+                    }
                 }
             }
         }
@@ -147,7 +157,10 @@ fun Bot.createCurrentDayScheduleTasks() {
                 executionTime = executionDateTime
             )
         } catch (e: Exception) {
-            println("Failed to create currentDayScheduleTasks: $e")
+            AccountingChatBot.logger.atWarn {
+                message = "Failed to create currentDayScheduleTasks"
+                cause = e
+            }
         }
 
     }
