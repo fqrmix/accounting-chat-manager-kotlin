@@ -2,6 +2,7 @@ package org.example.bot.utils
 
 import com.github.kotlintelegrambot.entities.Message
 import com.github.kotlintelegrambot.types.TelegramBotResult
+import org.example.bot.AccountingChatBot.Companion.logger
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.utils.UserGroup
 
@@ -32,10 +33,10 @@ fun <T> logSuccessOrError(vararg block: () -> TelegramBotResult<T>): TelegramBot
         result.fold(
             {
                 it as Message
-                println("Message was successfully send into chatID ${it.chat.id}. Message body: ${it.text.toString()}")
+                logger.info { "Message was successfully send into chatID ${it.chat.id}. Message body: ${it.text.toString()}" }
             },
             {
-                println("There was a error while sending a message. Reason: $it")
+                logger.error { "There was a error while sending a message. Reason: $it" }
             }
         )
     }

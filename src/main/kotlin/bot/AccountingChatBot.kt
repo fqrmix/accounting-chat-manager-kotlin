@@ -7,6 +7,7 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.document
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import org.example.bot.utils.ChatterMessage
 import org.example.bot.utils.logSuccessOrError
@@ -19,11 +20,16 @@ import org.example.storage.exposed.repository.impl.ScheduleRepositoryImpl
 import org.example.storage.exposed.utils.DatabaseSingleton.suspendedTransaction
 import java.time.LocalDateTime
 
+
+
 class AccountingChatBot {
 
     private var userStates: MutableMap<ChatId, State> = mutableMapOf()
 
     companion object {
+
+        val logger = KotlinLogging.logger {}
+
         private val TOKEN = System.getenv("TELEGRAM_TOKEN")
         private const val TIMEOUT_TIME = 30
         const val GROUP_CHAT_ID = -1002023309104
@@ -121,8 +127,10 @@ class AccountingChatBot {
                                     "При обработке графика произошла ошибка!\n\n${e.message}"
                                 )
                             })
-
-                            println(e)
+                            logger.atWarn {
+                                message = "There was a exception while document file is loading"
+                                cause = e
+                            }
                         }
                             userStates.remove(ChatId.fromId(message.chat.id))
                         }
@@ -191,7 +199,10 @@ class AccountingChatBot {
                             )},
                         )
                     } catch (e: Exception) {
-                        println(e)
+                        logger.atWarn {
+                            message = "There was a exception while bot initializing"
+                            cause = e
+                        }
                     }
 
                 }

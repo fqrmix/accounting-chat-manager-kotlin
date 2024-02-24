@@ -31,6 +31,8 @@ repositories {
 
 dependencies {
     val exposedVersion: String by project
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+    implementation("org.slf4j:slf4j-simple:2.0.3")
     implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.1.0")
     implementation("org.jetbrains.kotlinx:dataframe:0.12.0")
     implementation("org.postgresql:postgresql:42.7.1")
