@@ -7,6 +7,7 @@ import org.example.bot.AccountingChatBot
 import org.example.bot.AccountingChatBot.Companion.GROUP_CHAT_ID
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.repository.impl.ScheduleRepositoryImpl
+import org.example.storage.exposed.utils.UserGroup
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -22,32 +23,33 @@ fun Bot.createLunchTasks() {
 
     if (scheduleList.isNotEmpty()) {
         scheduleList.forEach {
-            try {
+            if (it.user.groupName == UserGroup.SUPPORT) {
+                try {
+                    val lunchMessage = ChatterMessage.Builder()
+                        .setType(ChatterMessage.Type.OUT_FOR_LUNCH_MESSAGE)
+                        .setUser(it.user)
+                        .build()
 
-                val lunchMessage = ChatterMessage.Builder()
-                    .setType(ChatterMessage.Type.OUT_FOR_LUNCH_MESSAGE)
-                    .setUser(it.user)
-                    .build()
-
-                MessageScheduler.createScheduledTask(
-                    RunnableTask {
-                        logSuccessOrError({
-                            this.sendMessage(
-                                chatId = ChatId.fromId(GROUP_CHAT_ID),
-                                text = lunchMessage.getText(),
-                                parseMode = lunchMessage.getParseMode()
-                            )
-                        })
-                    },
-                    executionTime = LocalDateTime.of(
-                        LocalDate.now(),
-                        LocalTime.parse(it.user.lunchTime)
+                    MessageScheduler.createScheduledTask(
+                        RunnableTask {
+                            logSuccessOrError({
+                                this.sendMessage(
+                                    chatId = ChatId.fromId(GROUP_CHAT_ID),
+                                    text = lunchMessage.getText(),
+                                    parseMode = lunchMessage.getParseMode()
+                                )
+                            })
+                        },
+                        executionTime = LocalDateTime.of(
+                            LocalDate.now(),
+                            LocalTime.parse(it.user.lunchTime)
+                        )
                     )
-                )
-            } catch (e: Exception) {
-                AccountingChatBot.logger.atWarn {
-                    message = "Failed to create createLunchTasks"
-                    cause = e
+                } catch (e: Exception) {
+                    AccountingChatBot.logger.atWarn {
+                        message = "Failed to create createLunchTasks"
+                        cause = e
+                    }
                 }
             }
         }
