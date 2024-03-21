@@ -12,6 +12,7 @@ import org.example.storage.exposed.repository.impl.UserRepositoryImpl
 import org.example.storage.exposed.utils.getUserGroupByName
 import org.jetbrains.kotlinx.dataframe.AnyFrame
 import org.jetbrains.kotlinx.dataframe.DataRow
+import org.jetbrains.kotlinx.dataframe.api.dropNulls
 import org.jetbrains.kotlinx.dataframe.api.select
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -63,7 +64,7 @@ class ExcelDataProcessor private constructor(
     }
 
     private fun processDateColumn(dataFrame: AnyFrame, date: String) {
-        for (item in dataFrame.select { "Name" and "Lunch" and "Group" and date }) {
+        for (item in dataFrame.select { "Name" and "Lunch" and "Group" and date }.dropNulls()) {
             if (item[date].toString().isNotEmpty()) {
                 try {
                     val user = buildUser(item)
