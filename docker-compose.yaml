@@ -2,6 +2,7 @@ version: '3'
 services:
   chat-manager-app:
     image: "fqrmix/accounting-chat-manager-kotlin:latest"
+    container_name: accounting-chat-manager-kotlin
     networks:
       - docker-private-network
     env_file:
