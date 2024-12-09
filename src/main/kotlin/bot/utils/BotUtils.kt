@@ -17,7 +17,7 @@ fun Bot.createLunchTasks() {
 
     with(ScheduleRepositoryImpl.getInstance()) {
         runBlocking {
-            scheduleList = findAllByDate(LocalDateTime.now())
+            scheduleList = findAllByDate(LocalDateTime.now()).distinctBy { it.user }
         }
     }
 
