@@ -21,5 +21,4 @@ class TimeObject(
 
     fun getStartTime() = getLocalTime(startTime)
     fun getEndTime() = getLocalTime(endTime)
-
 }

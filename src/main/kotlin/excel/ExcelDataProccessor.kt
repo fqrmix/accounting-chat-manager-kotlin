@@ -107,14 +107,24 @@ class ExcelDataProcessor private constructor(
 
     private fun buildTimeList(dateValue: String): List<TimeObject> {
         return try {
-            if (dateValue.contains("\n") && dateValue.length > 12) {
-                dateValue.split("\n").map { scheduleBuilderFactory.createTimeObject(it.trim()) }
+            val trimmedDateValue = dateValue.trim()
+            val delimiter = trimmedDateValue.getDelimeter()
+            if (delimiter != null && dateValue.contains(delimiter) && dateValue.length > 12) {
+                dateValue.split(delimiter).map { scheduleBuilderFactory.createTimeObject(it.trim()) }
             } else {
                 listOf(scheduleBuilderFactory.createTimeObject(dateValue.trim()))
             }
         } catch (e: Exception) {
             // Обработка ошибок при создании списка TimeObject
             throw RuntimeException("Failed to build time list: ${e.message}")
+        }
+    }
+
+    private fun String.getDelimeter(): String? {
+        return when {
+            this.contains("\n") -> "\n"
+            this.contains(" ") -> " "
+            else -> null
         }
     }
 
