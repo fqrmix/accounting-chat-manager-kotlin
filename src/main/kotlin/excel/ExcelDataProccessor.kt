@@ -110,7 +110,11 @@ class ExcelDataProcessor private constructor(
             val trimmedDateValue = dateValue.trim()
             val delimiter = trimmedDateValue.getDelimeter()
             if (delimiter != null && dateValue.contains(delimiter) && dateValue.length > 12) {
-                dateValue.split(delimiter).map { scheduleBuilderFactory.createTimeObject(it.trim()) }
+                dateValue
+                    .split(delimiter)
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .map { scheduleBuilderFactory.createTimeObject(it) }
             } else {
                 listOf(scheduleBuilderFactory.createTimeObject(dateValue.trim()))
             }
