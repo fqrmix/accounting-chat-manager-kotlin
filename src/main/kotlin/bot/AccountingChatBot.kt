@@ -11,13 +11,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import org.example.bot.utils.ChatterMessage
 import org.example.bot.utils.logSuccessOrError
-import org.example.excel.ExcelDataProcessor
-import org.example.excel.parser.ScheduleParser
-import org.example.excel.utils.DefaultScheduleBuilderFactory
-import org.example.excel.utils.ScheduleFile
+import org.example.excel.ScheduleUploadService
 import org.example.storage.exposed.models.Schedule
 import org.example.storage.exposed.repository.impl.ScheduleRepositoryImpl
-import org.example.storage.exposed.utils.DatabaseSingleton.suspendedTransaction
 import java.time.LocalDateTime
 
 
@@ -72,48 +68,8 @@ class AccountingChatBot {
                     if (userStates[ChatId.fromId(message.chat.id)] == State.LOAD_PENDING) {
                         message.document?.let {
                         try {
-                            val excelParser = ScheduleParser()
-                            val scheduleBuilderFactory = DefaultScheduleBuilderFactory()
-                            val scheduleFile = ScheduleFile(bot.downloadFileBytes(it.fileId)!!)
-
-                            val excelDataProcessor = ExcelDataProcessor.ExcelDataProcessorBuilder()
-                                .setExcelParser(excelParser)
-                                .setScheduleBuilderFactory(scheduleBuilderFactory)
-                                .setScheduleFile(scheduleFile)
-                                .build()
-
-                            val scheduleList = excelDataProcessor.getScheduleList()
-                            val schedulesToDelete = mutableListOf<Schedule>()
-
-                            with(ScheduleRepositoryImpl.getInstance()) {
-                                val databaseSchedules = runBlocking { findAll() }
-
-                                databaseSchedules.forEach { databaseSchedule ->
-                                    scheduleList.forEach { currentSchedule ->
-                                        if (currentSchedule.startDateTime.toLocalDate() == databaseSchedule.startDateTime.toLocalDate()
-                                            && currentSchedule.endDateTime.toLocalDate() == databaseSchedule.endDateTime.toLocalDate()
-                                        ) {
-                                            schedulesToDelete.add(databaseSchedule)
-                                        }
-                                    }
-                                }
-
-                                val databaseActions = mutableListOf<() -> Unit>()
-
-                                if(schedulesToDelete.isNotEmpty()) {
-                                    databaseActions += { runBlocking { batchDelete(schedulesToDelete.distinct()) } }
-                                }
-
-                                if (scheduleList.isNotEmpty()) {
-                                    databaseActions += { runBlocking { batchCreate(scheduleList) } }
-                                }
-
-                                if (databaseActions.isNotEmpty()) {
-                                    suspendedTransaction {
-                                        databaseActions.forEach{ it() }
-                                    }
-                                }
-                            }
+                            val fileBytes = bot.downloadFileBytes(it.fileId)!!
+                            runBlocking { ScheduleUploadService.replaceSchedulesFromExcel(fileBytes) }
                             logSuccessOrError({
                                 bot.sendMessage(
                                     ChatId.fromId(message.chat.id),

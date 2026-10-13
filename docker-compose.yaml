@@ -1,20 +1,55 @@
-version: '3'
 services:
+  postgres:
+    image: "postgres:16-alpine"
+    container_name: accounting-chat-manager-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-accounting}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   chat-manager-app:
     image: "fqrmix/accounting-chat-manager-kotlin:latest"
     container_name: accounting-chat-manager-kotlin
-    networks:
-      - docker-private-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       TZ: "Europe/Moscow"
       TELEGRAM_TOKEN: "${TELEGRAM_TOKEN}"
-      POSTGRES_URL: "${POSTGRES_URL}"
+      POSTGRES_URL: "jdbc:postgresql://postgres:5432/${POSTGRES_DB:-accounting}"
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      ADMIN_API_PORT: "${ADMIN_API_PORT:-8081}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      JWT_SECRET: "${JWT_SECRET}"
+      ADMIN_CORS_ORIGINS: "${ADMIN_CORS_ORIGINS:-http://localhost:5173}"
+    ports:
+      - "${ADMIN_API_PORT:-8081}:${ADMIN_API_PORT:-8081}"
     command: ["java", "-jar", "app.jar"]
 
-networks:
-  docker-private-network:
-    external: true
+  admin-frontend:
+    build:
+      context: ./admin-frontend
+    container_name: accounting-chat-manager-admin-frontend
+    restart: unless-stopped
+    depends_on:
+      - chat-manager-app
+    environment:
+      ADMIN_API_PORT: "${ADMIN_API_PORT:-8081}"
+    ports:
+      - "${ADMIN_FRONTEND_PORT:-8080}:80"
+
+volumes:
+  postgres-data:

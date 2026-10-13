@@ -1,6 +1,7 @@
 plugins {
     id("org.jetbrains.kotlinx.dataframe") version "0.12.0"
     kotlin("jvm") version "1.9.21"
+    kotlin("plugin.serialization") version "1.9.21"
     application
     id("java")
 }
@@ -31,6 +32,7 @@ repositories {
 
 dependencies {
     val exposedVersion: String by project
+    val ktorVersion: String by project
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.slf4j:slf4j-simple:2.0.3")
     implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.1.0")
@@ -40,6 +42,17 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+
+    implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-cors-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging-jvm:$ktorVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
