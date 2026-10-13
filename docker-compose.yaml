@@ -51,6 +51,16 @@ services:
       ADMIN_API_PORT: "${ADMIN_API_PORT:-8081}"
     ports:
       - "${ADMIN_FRONTEND_PORT:-8080}:80"
+    networks:
+      - default
+      # So the shared nginx-border-balancer (a separate compose project) can
+      # reach this container by name to route accounting-admin.* to it.
+      - docker-private-network
 
 volumes:
   postgres-data:
+
+networks:
+  default: {}
+  docker-private-network:
+    external: true
